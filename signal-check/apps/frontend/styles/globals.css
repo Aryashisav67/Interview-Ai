@@ -1,0 +1,200 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+  SIGNAL CHECK — design tokens
+  Concept: a hardware audio console / broadcast rack. The app already measures
+  real mic + AI voice levels, so the whole UI borrows the vocabulary of a
+  channel strip: patch inputs, LED segment meters, rack-unit numbering,
+  toggle switches. Deliberately not the glowing-orb / violet-gradient look.
+*/
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --font-display: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root {
+  --radius: 0.25rem;
+
+  /* Ink — deep slate-teal, not pure black */
+  --background: #0f1517;
+  --foreground: #f2efe6;
+
+  --card: #171f22;
+  --card-foreground: #f2efe6;
+
+  --popover: #171f22;
+  --popover-foreground: #f2efe6;
+
+  /* Signal amber — the tally-light accent */
+  --primary: #ff7a29;
+  --primary-foreground: #0f1517;
+
+  --secondary: #1c2528;
+  --secondary-foreground: #f2efe6;
+
+  --muted: #1a2225;
+  --muted-foreground: #8b969b;
+
+  /* Wire teal — the trace/waveform accent */
+  --accent: #37e6c4;
+  --accent-foreground: #0f1517;
+
+  --destructive: #ff5c5c;
+
+  --border: rgba(242, 239, 230, 0.1);
+  --input: rgba(242, 239, 230, 0.07);
+  --ring: #ff7a29;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+body {
+  background-image:
+    linear-gradient(rgba(242, 239, 230, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 239, 230, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ---- Signature element: segmented LED meter ---- */
+.led-meter {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 3px;
+}
+.led-meter .seg {
+  width: 100%;
+  height: 6px;
+  border-radius: 1px;
+  background: rgba(242, 239, 230, 0.08);
+  transition: background-color 80ms linear;
+}
+.led-meter .seg[data-lit="amber"] {
+  background: var(--primary);
+  box-shadow: 0 0 6px color-mix(in oklab, var(--primary) 60%, transparent);
+}
+.led-meter .seg[data-lit="teal"] {
+  background: var(--accent);
+  box-shadow: 0 0 6px color-mix(in oklab, var(--accent) 60%, transparent);
+}
+.led-meter .seg[data-lit="red"] {
+  background: var(--destructive);
+  box-shadow: 0 0 6px color-mix(in oklab, var(--destructive) 60%, transparent);
+}
+
+/* ---- Rack channel strip labels ---- */
+.rack-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* ---- Patch-bay style input frame ---- */
+.patch-frame {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-md);
+}
+
+/* ---- Tally / status indicator ---- */
+.tally-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--muted-foreground);
+}
+.tally-dot[data-state="live"] {
+  background: var(--destructive);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--destructive) 70%, transparent);
+  animation: tally-pulse 1.4s ease-in-out infinite;
+}
+.tally-dot[data-state="ready"] {
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in oklab, var(--accent) 70%, transparent);
+}
+@keyframes tally-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---- Scanline sweep on the hero strip ---- */
+.strip-scan {
+  position: relative;
+  overflow: hidden;
+}
+.strip-scan::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--accent) 18%, transparent),
+    transparent
+  );
+  width: 40%;
+  animation: sweep 5s linear infinite;
+}
+@keyframes sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .strip-scan::after {
+    animation: none;
+    display: none;
+  }
+  .tally-dot[data-state="live"] {
+    animation: none;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
