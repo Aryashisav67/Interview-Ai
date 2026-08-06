@@ -4,14 +4,6 @@ A voice-based technical interview tool. Paste a GitHub profile, talk through
 a live AI interview grounded in your public repos, get a scored transcript
 at the end.
 
-This is a redesigned rebuild of [code100x/ai-interviewer](https://github.com/code100x/ai-interviewer)
-(the interview built in [this video by Harkirat Singh](https://www.youtube.com/watch?v=iNJ7z4YLQFk)) —
-same architecture and flow, different visual identity: a broadcast/audio-console
-look (patch inputs, segmented LED meters, rack-channel labels) instead of the
-original's dark gradient-orb UI, since the app is literally reading live mic
-and AI voice levels.
-
-```
 apps/
   backend/    Express API — scrapes GitHub, brokers the WebRTC call to
               OpenAI's Realtime API, scores the finished interview with Gemini
